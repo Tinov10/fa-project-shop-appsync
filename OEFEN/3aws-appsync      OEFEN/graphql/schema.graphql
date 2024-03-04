@@ -1,0 +1,43 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+# we add authentication by adding @aws so only logged in user (cognito) can make these request and guest users also because we add @aws_iam
+
+# for getting the orders you have to have a account so there we don't add @aws_iam
+
+type Query {
+  paymentIntent(order: Order!): String @aws_cognito_user_pools @aws_iam
+  getCustomerOrders: CustomerOrders @aws_cognito_user_pools
+}
+
+type Mutation {
+  deleteAccount: String @aws_cognito_user_pools
+}
+
+type CustomerOrder{ @aws_cognito_user_pools
+  price: Float!
+  orderStatus: String!
+  products: [Product]
+  shipmentDate: String
+  orderId: ID!
+  orderDate: String!
+}
+
+      # this is what we store inside the orders table
+      # pid,
+      # validatedPrice,
+      # identity,
+      # receiptEmail,
+      # products,
+      # shipping,
+      //
+      # orderId,
+      # orderDate,
+
+type CustomerOrders{ @aws_cognito_user_pools
+  orders: [CustomerOrder]
+}
+
+

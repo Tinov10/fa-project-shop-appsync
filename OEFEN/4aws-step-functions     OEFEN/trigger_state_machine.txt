@@ -1,0 +1,81 @@
+// the ouput of this lambda will be inside of the object with a key called payload.
+// this lambda runs inside of a task therefore the output of the task contains the output of this lambda therefore we say inside the task that we only want to return the key "Payload" otherwist we return the whole object including all other task related things. The return of the lambda is inside "Payload". The return goes to the statemachine.
+
+// which function is triggerin this lambda? --> graphql appsync triggers this lambda
+
+// how do we trigger this function / trigger the statemachine to start executing?
+
+// 1 infrastructure
+/*
+
+// which import do we need? 
+
+import * as sfn from 'aws-cdk-lib/aws-stepfunctions'
+
+// get the stateMachine out of the template 
+
+const paymentIntentStateMachine = sfn.StateMachine.fromStateMachineArn(
+  this, 
+  'PaymentIntentStateMachine', 
+  props.stepfunctionArn)
+
+// grant permission to start the exectution of the stateMachine to the Resolver / lambda 
+
+paymentIntentStateMachine.grantStartExecution(paymentResolver)
+
+*/
+
+// 2 inside the src code of the lambda = paymentResolver
+/*
+
+// which imports do we need 
+
+import {    SFNClient, 
+            StartExecutionCommand, 
+            StartExecutionCommandInput } from '@aws-sdk/client-sfn' 
+
+// 1 create the step function client use lazy loading 
+
+let sfn:SFNClient
+
+if(!sfn) sfn = new SFNClient({})
+
+// trigger the step function 
+// 2 create the event first which must be a string!!
+// which data do we want to send to the stepMachine? 
+
+
+// create the event 
+const validationEvent = JSON.stringify({
+  pid: paymentIntent.id, 
+  user: 
+  identity:
+  validatePrice, 
+  products: event.arguments.order.products
+})
+
+// 3 create the input 
+
+const input: StartExecutionCommandInput = {
+  stateMachineArn: process.env.PAYMENT_PROCESSING_ARN!, 
+  input: validationEvent
+}
+
+// 4 create the command 
+
+const command = new StartExecutionCommand(input)
+
+// 5 send the command / event 
+
+await sfn.send(command)
+
+*/
+
+// this is what the SubmitHandler receives 
+export interface ISubmitEvent {
+  pid: string;
+  user: boolean;
+  identity: string; // sub of user or 'anonymous' (if we don't have IAM user)
+  validatePrice: string; // total price of the products
+  products: IProduct[];
+}

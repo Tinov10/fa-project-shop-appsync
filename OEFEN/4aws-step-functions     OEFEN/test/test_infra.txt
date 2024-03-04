@@ -1,0 +1,49 @@
+Which tests do we have? 
+
+1) are all the resources that we want crated? 
+- the cloudFormation template should contain all the resources that we want 
+
+import * as cdk                 from 'aws-cdk-lib' 
+import * as AwsStepFunctions    from '../lib/aws-step-functions-stack' 
+import { stackProps }           from '../bin/conig' 
+
+import { Template }             from 'aws-cdk-lib/assertions'
+
+// we create the "bin" sort of 
+
+const app = new cdk.App()
+const stack = new AwsStepFunctions.AwsStepFunctionsStack(app, 'MyTestStack', stackProps)
+const template = Template.fromStack(stack)
+
+test('Lambda functions created', () => {
+
+  template.hasResourceProperties('AWS::Lambda::Function', {
+    FunctionName: 'submitJob', 
+    Handler:      'index.handler', 
+    RunTime:      'nodejs18.x', 
+    Timeout:      60, 
+  })
+
+  template.hasResourceProperties..........all the other lambdas in test 1 
+})
+
+test('StateMachine created', () => {
+  template.hasResourceProperties('AWS::StepFunctions::StateMachine', {
+    StateMachineName: 'ph-payment-processing', 
+  })
+})
+
+/* bin
+import * as cdk                   from 'aws-cdk-lib';
+import { AwsStepFunctionsStack }  from '../lib/aws-step-functions-stack';
+import { stackProps }             from './config';
+
+import { AwsSolutionsChecks }     from 'cdk-nag';
+
+const app = new cdk.App();
+
+new AwsStepFunctionsStack(app, 'AwsStackFunctionsStack', stackProps);
+
+cdk.Aspects.of(app).add(new AwsSolutionsChecks());
+*/
+

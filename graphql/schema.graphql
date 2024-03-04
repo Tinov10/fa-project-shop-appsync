@@ -1,0 +1,30 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+type Query {
+  paymentIntent(order: Order!): String @aws_cognito_user_pools @aws_iam
+  getCustomerOrders: CustomerOrders @aws_cognito_user_pools
+}
+
+type Mutation {
+  deleteAccount: String @aws_cognito_user_pools
+}
+
+type CustomerOrder{ @aws_cognito_user_pools
+  price: Float!
+  orderStatus: String!
+  products: [Product]
+  shipmentDate: String
+  orderId: ID!
+  orderDate: String!
+}
+
+type CustomerOrders{ @aws_cognito_user_pools
+  orders: [CustomerOrder]
+}
+
+
+
+

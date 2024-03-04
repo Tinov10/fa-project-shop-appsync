@@ -1,0 +1,76 @@
+How do we test the actual code of the lambdas? 
+
+1 Import the handlers 
+
+We are testing the handlers. So we first has to import them. 
+
+import {handler as submitHandler}   from '../src/submit' 
+import {handler as statusHandler}   from '../src/status' 
+import {handler as finalizeHandler} from '../src/finalize' 
+
+2. Mock the aws services that we use inside of the lambda 
+
+Which aws clients / services are we using inside of the lambdas? 
+import { DynamoDBClient }           from '@aws-sdk/client-dynamodb'
+import { DynamoDBDocumentClient }   from '@aws-sdk/lib-dynamodb' 
+import { CloudWatchClient }         from '@aws-sdk/client-cloudwatch' 
+
+How can we mock the aws clients / services? 
+import { mockClient }               from 'aws-sdk-client-mock'
+
+3. Mock the return values of the stripe functions we use inside the lambdas --> we can say what to return 
+   inside the test
+
+const stripePaymentIntentMock = jest.fn()
+const stripePaymentMethodMock = jest.fn()
+
+jest.mock('stripe', () => ({
+  __esmodule: true,                                     // because it is a module we have to put this here 
+  default:    jest.fn().mockImplementation(() => ({
+                paymentIntents: {
+                  retrieve: stripePaymentIntentMock
+                }, 
+                paymentMethods: {
+                  retrieve: stripePaymentMethodMock
+    }
+  }))
+}))
+
+4. Mock uuid --> fixed return value 
+
+jest.mock('uuid', () => ({
+  __esmodule: true, 
+  v4:         jest.fn().mockReturnValue('345787-45989534895345-3458938-xxxx')
+}))
+
+Create the test for each step function / lambda / handler 
+
+describe('submit function', () => {
+  test('should submit a new order', async () => {
+    const result = await submitHandler(submitEvent)
+
+    expect(result).toEqual({...submitEvent, retries: 0, waitSeconds: 150})
+  })
+})
+
+STATUS 
+
+We run a test for each of the possible outcomes. 
+
+
+
+FINALIZE 
+
+test('Should fail finalizing a new order', async () => {
+  dbMockClient.on(  PutCommand)           .rejects({})
+  dbMockClient.on(  UpdateCommand)        .rejects({})
+  cwMockClient.on(  PutMetricDataCommand) .resolves({})
+
+  await finalizeHandler(  finalizeEvent() )                         // function that creates the event
+
+  
+})
+
+
+
+

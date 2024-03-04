@@ -1,0 +1,10 @@
+the user tries to pay when has inserted his credentials he has payd 
+
+then we check the payment inside the first step function 
+
+What are stepfunctions? It are all lambdas so we have 3 lambdas 
+
+How do we trigger the first lambda in de step functions
+
+We have jobs inside the state machine which are lambdas. Each lambda has its own IEvent. 
+
